@@ -82,6 +82,20 @@ async function pasteLink(){
   }catch(e){ document.getElementById('fbUrl').focus(); }
 }
 
+// Instant Direct Download Trigger for Mobile Browsers
+function triggerDownload(videoUrl, btnElement) {
+  btnElement.innerText = "Starting Download...";
+  btnElement.disabled = true;
+
+  // Direct redirection forces mobile browser to start downloading the file
+  window.location.href = videoUrl;
+
+  setTimeout(() => {
+    btnElement.innerText = "Download Now";
+    btnElement.disabled = false;
+  }, 2500);
+}
+
 async function downloadFB(){
   const url = document.getElementById('fbUrl').value.trim();
   const resDiv = document.getElementById('fbResult');
@@ -116,8 +130,6 @@ async function downloadFB(){
     }
 
     const videoUrl = data.hd || data.sd;
-    // Worker proxy endpoint taake browser direct download trigger kare (CORS bypass)
-    const proxyDownloadUrl = `${WORKER_URL}?download=${encodeURIComponent(videoUrl)}`;
 
     resDiv.innerHTML = `
       <div class="fb-card">
@@ -125,10 +137,10 @@ async function downloadFB(){
         <div style="flex:1">
           <b style="font-size:14px;line-height:1.4;display:block">${data.title || 'Facebook Video'}</b>
           <span style="font-size:12px;color:#64748b">Ready to download</span>
-          <a href="${proxyDownloadUrl}" class="fb-btn" style="display:block;text-align:center;width:100%;margin-top:10px;padding:12px;text-decoration:none;" download="facebook-video.mp4">Download Now</a>
+          <button onclick="triggerDownload('${videoUrl}', this)" class="fb-btn" style="width:100%;margin-top:10px;padding:11px;cursor:pointer;">Download Now</button>
         </div>
       </div>
-      <div class="success" style="margin-top:10px">✅ Video found! Click download button to save directly.</div>
+      <div class="success" style="margin-top:10px">✅ Video found! Click download button to save.</div>
     `;
     btn.innerText = "Download Video";
     btn.disabled = false;
